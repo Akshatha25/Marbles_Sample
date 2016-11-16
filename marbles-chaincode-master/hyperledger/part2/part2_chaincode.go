@@ -27,8 +27,9 @@ import (
 	"time"
 	"strings"
 
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-)
+	//"github.com/hyperledger/fabric/core/chaincode/shim"
+"github.com/openblockchain/obc-peer/openchain/chaincode/shim"
+	)
 
 // SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {

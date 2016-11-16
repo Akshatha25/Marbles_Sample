@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/openblockchain/obc-peer/openchain/chaincode/shim"
+	
 )
 
 // SimpleChaincode example simple Chaincode implementation
