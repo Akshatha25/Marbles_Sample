@@ -82,7 +82,7 @@ func (t *SimpleChaincode) Init(stub *shim.ChaincodeStub, function string, args [
 	}
 
 	// Initialize the chaincode
-	Aval, err = strconv.Atoi("Blockchain")
+	Aval, err = strconv.Atoi(args[0])
 	if err != nil {
 		return nil, errors.New("Expecting integer value for asset holding")
 	}
@@ -179,8 +179,7 @@ func (t *SimpleChaincode) read(stub *shim.ChaincodeStub, args []string) ([]byte,
 		return nil, errors.New("Incorrect number of arguments. Expecting name of the var to query")
 	}
 
-	//name = args[0]
-	name = "Blockchain"
+	name = args[0]
 	valAsbytes, err := stub.GetState(name)									//get the var from chaincode state
 	if err != nil {
 		jsonResp = "{\"Error\":\"Failed to get state for " + name + "\"}"
@@ -198,8 +197,7 @@ func (t *SimpleChaincode) Delete(stub *shim.ChaincodeStub, args []string) ([]byt
 		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
 	
-	//name := args[0]
-	name := "Blockchain"
+	name := args[0]
 	err := stub.DelState(name)													//remove the key from chaincode state
 	if err != nil {
 		return nil, errors.New("Failed to delete state")
@@ -242,7 +240,7 @@ func (t *SimpleChaincode) Write(stub *shim.ChaincodeStub, args []string) ([]byte
 		return nil, errors.New("Incorrect number of arguments. Expecting 2. name of the variable and value to set")
 	}
 
-	name = "Blockchain"															//rename for funsies
+	name = args[0]														//rename for funsies
 	value = args[1]
 	err = stub.PutState(name, []byte(value))								//write the variable into the chaincode state
 	if err != nil {
@@ -277,7 +275,7 @@ func (t *SimpleChaincode) init_marble(stub *shim.ChaincodeStub, args []string) (
 	if len(args[3]) <= 0 {
 		return nil, errors.New("4th argument must be a non-empty string")
 	}
-	name := "Blockchain"
+	name := args[0]
 	color := strings.ToLower(args[1])
 	user := strings.ToLower(args[3])
 	size, err := strconv.Atoi(args[2])
@@ -336,8 +334,8 @@ func (t *SimpleChaincode) set_user(stub *shim.ChaincodeStub, args []string) ([]b
 	}
 	
 	fmt.Println("- start set user")
-	fmt.Println("Blockchain" + " - " + args[1])
-	marbleAsBytes, err := stub.GetState("Blockchain")
+	fmt.Println(args[0] + " - " + args[1])
+	marbleAsBytes, err := stub.GetState(args[0])
 	if err != nil {
 		return nil, errors.New("Failed to get thing")
 	}
@@ -346,7 +344,7 @@ func (t *SimpleChaincode) set_user(stub *shim.ChaincodeStub, args []string) ([]b
 	res.User = args[1]														//change the user
 	
 	jsonAsBytes, _ := json.Marshal(res)
-	err = stub.PutState("Blockchain", jsonAsBytes)								//rewrite the marble with id as key
+	err = stub.PutState(args[0], jsonAsBytes)								//rewrite the marble with id as key
 	if err != nil {
 		return nil, err
 	}
@@ -378,7 +376,7 @@ func (t *SimpleChaincode) open_trade(stub *shim.ChaincodeStub, args []string) ([
 	}
 
 	open := AnOpenTrade{}
-	open.User = "Blockchain"
+	open.User = args[0]
 	open.Timestamp = makeTimestamp()											//use timestamp as an ID
 	open.Want.Color = args[1]
 	open.Want.Size =  size1
@@ -438,7 +436,7 @@ func (t *SimpleChaincode) perform_trade(stub *shim.ChaincodeStub, args []string)
 	}
 	
 	fmt.Println("- start close trade")
-	timestamp, err := strconv.ParseInt("Blockchain", 10, 64)
+	timestamp, err := strconv.ParseInt(args[0], 10, 64)
 	if err != nil {
 		return nil, errors.New("1st argument must be a numeric string")
 	}
@@ -555,7 +553,7 @@ func (t *SimpleChaincode) remove_trade(stub *shim.ChaincodeStub, args []string) 
 	}
 	
 	fmt.Println("- start remove trade")
-	timestamp, err := strconv.ParseInt("Blockchain" ,10, 64)
+	timestamp, err := strconv.ParseInt(args[0], 10, 64)
 	if err != nil {
 		return nil, errors.New("1st argument must be a numeric string")
 	}
