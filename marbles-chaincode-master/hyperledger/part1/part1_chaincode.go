@@ -110,6 +110,8 @@ func (t *SimpleChaincode) Invoke(stub *shim.ChaincodeStub, function string, args
 		return t.Write(stub, args)
 	} else if function == "init_marble" {									//create a new marble
 		return t.init_marble(stub, args)
+	}else if function == "init_marble1" {									//create a new marble
+		return t.init_marble1(stub, args)
 	} else if function == "set_user" {										//change owner of a marble
 		return t.set_user(stub, args)
 	}
@@ -270,6 +272,63 @@ func (t *SimpleChaincode) init_marble(stub *shim.ChaincodeStub, args []string) (
 
 	fmt.Println("- end init marble")
 	return nil, nil
+}
+func (t *SimpleChaincode) init_marble1(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+               var err error
+
+               //   0       1       2     3		4
+               // "asdf", "blue", "35", "bob", "23"
+               if len(args) != 5 {
+                              return nil, errors.New("Incorrect number of arguments. Expecting 4")
+               }
+
+               fmt.Println("- start init marble")
+               if len(args[0]) <= 0 {
+                              return nil, errors.New("1st argument must be a non-empty string")
+               }
+               if len(args[1]) <= 0 {
+                              return nil, errors.New("2nd argument must be a non-empty string")
+               }
+               if len(args[2]) <= 0 {
+                              return nil, errors.New("3rd argument must be a non-empty string")
+               }
+               if len(args[3]) <= 0 {
+                              return nil, errors.New("4th argument must be a non-empty string")
+               }
+               if len(args[4]) <= 0 {
+                              return nil, errors.New("5th argument must be a non-empty string")
+               }
+               size, err := strconv.Atoi(args[2])
+               if err != nil {
+                              return nil, errors.New("3rd argument must be a numeric string")
+               }
+               
+               color := strings.ToLower(args[1])
+               user := strings.ToLower(args[3])
+
+               str := `{"name": "` + args[0] + `", "color": "` + color + `", "size": ` + strconv.Itoa(size) + `, "user": "` + user +`, "extVal": "` + extVal + `"}`
+			  
+               err = stub.PutState(args[0], []byte(str))                                                                                                              //store marble with id as key
+               if err != nil {
+                              return nil, err
+               }
+                              
+               //get the marble index
+               marblesAsBytes, err := stub.GetState(marbleIndexStr)
+               if err != nil {
+                              return nil, errors.New("Failed to get marble index")
+               }
+               var marbleIndex []string
+               json.Unmarshal(marblesAsBytes, &marbleIndex)                                                                                            //un stringify it aka JSON.parse()
+               
+               //append
+               marbleIndex = append(marbleIndex, args[0])                                                                                                                  //add marble name to index list
+               fmt.Println("! marble index: ", marbleIndex)
+               jsonAsBytes, _ := json.Marshal(marbleIndex)
+               err = stub.PutState(marbleIndexStr, jsonAsBytes)                                                                             //store name of marble
+
+               fmt.Println("- end init marble1111111111111")
+               return nil, nil
 }
 
 // ============================================================================================================================
